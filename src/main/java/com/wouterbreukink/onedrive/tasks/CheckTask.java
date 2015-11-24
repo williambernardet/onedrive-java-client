@@ -2,6 +2,7 @@ package com.wouterbreukink.onedrive.tasks;
 
 import com.google.api.client.util.Maps;
 import com.google.api.client.util.Preconditions;
+import com.wouterbreukink.onedrive.CommandLineOpts.Behaviour;
 import com.wouterbreukink.onedrive.client.OneDriveItem;
 import com.wouterbreukink.onedrive.filesystem.FileSystemProvider;
 
@@ -150,7 +151,9 @@ public class CheckTask extends Task {
         if (remoteOnly) {
             switch (getCommandLineOpts().getDirection()) {
                 case UP:
-                    queue.add(new DeleteTask(getTaskOptions(), remoteFile));
+                	if (getCommandLineOpts().getBehaviour() == Behaviour.SYNC) {
+                		queue.add(new DeleteTask(getTaskOptions(), remoteFile));
+                	}
                     break;
                 case DOWN:
                     queue.add(new DownloadTask(getTaskOptions(), this.localFile, remoteFile, false));
@@ -167,7 +170,9 @@ public class CheckTask extends Task {
                     queue.add(new UploadTask(getTaskOptions(), this.remoteFile, localFile, false));
                     break;
                 case DOWN:
-                    queue.add(new DeleteTask(getTaskOptions(), localFile));
+                	if (getCommandLineOpts().getBehaviour() == Behaviour.SYNC) {
+                		queue.add(new DeleteTask(getTaskOptions(), localFile));
+                	}
                     break;
                 default:
                     throw new IllegalStateException("Unsupported direction " + getCommandLineOpts().getDirection());

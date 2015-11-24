@@ -32,6 +32,7 @@ public class CommandLineOpts {
     private int tries = 3;
     private boolean version = false;
     private boolean recursive = false;
+    private Behaviour behaviour = Behaviour.SYNC;
     private int maxSizeKb = 0;
     private Path keyFile = Paths.get("onedrive.key");
     private boolean dryRun = false;
@@ -79,6 +80,13 @@ public class CommandLineOpts {
                 throw new ParseException("Direction must be one of up or down");
             }
             opts.direction = Direction.valueOf(chosen.toUpperCase());
+        }
+        if (line.hasOption("behaviour")) {
+            String chosen = line.getOptionValue("behaviour").toLowerCase();
+            if (!chosen.equals("sync") && !chosen.equals("copy")) {
+                throw new ParseException("Direction must be one of up or down");
+            }
+            opts.behaviour = Behaviour.valueOf(chosen.toUpperCase());
         }
 
         if (line.hasOption("threads")) {
@@ -142,6 +150,13 @@ public class CommandLineOpts {
                 .hasArg()
                 .argName("up|down")
                 .desc("direction of synchronisation.")
+                .build();
+        
+        Option behaviour = Option.builder()
+                .longOpt("behaviour")
+                .hasArg()
+                .argName("sync|copy")
+                .desc("type of synchronisation.")
                 .build();
 
         Option help = Option.builder("h")
@@ -251,7 +266,8 @@ public class CommandLineOpts {
                 .addOption(splitAfter)
                 .addOption(threads)
                 .addOption(version)
-                .addOption(retries);
+                .addOption(retries)
+                .addOption(behaviour);
     }
 
     public static void printHelp() {
@@ -261,6 +277,10 @@ public class CommandLineOpts {
 
     public Direction getDirection() {
         return direction;
+    }
+    
+    public Behaviour getBehaviour() {
+        return behaviour;
     }
 
     public String getLocalPath() {
@@ -327,4 +347,11 @@ public class CommandLineOpts {
         UP,
         DOWN
     }
+
+
+    public enum Behaviour {
+        SYNC,
+        COPY
+    }
+
 }
